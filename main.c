@@ -46,8 +46,9 @@ int main(int argc, char *argv[])
 
     printf("\n\nImpresion de la Tabla de Símbolos\n");
     imprimirArbol();
+    printf("\n\n");
 
-    //Iniciamos sistema de entrada
+    //Pasamos el archivo hasta flex
     if(inicia(argv[1])==-1){
         exit(-1);
     }
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
     //Invocamos al analizador sintáctico
     sintactico();
 
-    printf("\n\nImpresion de la Tabla de Símbolos\n");
+    printf("\n\n\nImpresion de la Tabla de Símbolos\n");
     imprimirArbol();
     
     destruirTablaSimbolos();
