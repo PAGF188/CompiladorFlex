@@ -7,9 +7,18 @@ int lineas=0;  //variable global para hacer visible al lexico el nº de línea d
 %}
 %option noyywrap
 
+IDENTIFICADOR       [_A-Za-z][A-Za-z0-9_]*
+COMENTARIO_LINEA    \/\/.*
+COMENTARIO_BLOQUE   \/\*(.|\n)*\*\/
+
+
 %%
 
-\n      ++lineas;
+{IDENTIFICADOR}     return(insertarComponenteLexico(strdup(yytext)));
+{COMENTARIO_LINEA}  printf("\ncomentario linea: %s\n\n", yytext);
+{COMENTARIO_BLOQUE} printf("\ncomentario: %s\n\n", yytext);
+
+\n        ++lineas;
 "/"       return((int) '/');
 "/="      return(_BARRA_IGUAL);
 "."       return((int) '.');
@@ -65,6 +74,7 @@ int lineas=0;  //variable global para hacer visible al lexico el nº de línea d
 "@"       return((int) '@');
 "=>"      return(_IGUAL_MAYOR);
 "#"       return((int) '#');
+
 <<EOF>> {
             //finArchivo();
             return(_EOF);
