@@ -25,4 +25,14 @@ typedef struct {
  */
 tipoLexico siguienteComponente();
 
+
+/**
+ * Función para iniciar el sistema de entrada. 
+ * Comprueba que existe el archivo.
+ * Introduce en flex el archivo a analizar. 
+ * @param path, ruta al archivo a compilar.
+ * @return int, código de error (-1 fallo en el inicio, 1 inicio correcto)
+ */ 
+int inicia(char *path);
+
 #endif	/* __LEXICO */

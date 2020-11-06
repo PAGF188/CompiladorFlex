@@ -13,9 +13,10 @@
 #include <stdlib.h>
 #include "./headerFiles/Errores.h"
 #include "./headerFiles/Sintactico.h"
-#include "./headerFiles/SistemaEntrada.h"
 #include "./headerFiles/TablaSimbolos.h"
 #include "./headerFiles/Definiciones.h"
+#include "./headerFiles/Lexico.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
 
 
     //Iniciamos sistema de entrada
-    if(iniciaSistemaEntrada(argv[1])==-1){
+    if(inicia(argv[1])==-1){
         exit(-1);
     }
 
@@ -57,10 +58,5 @@ int main(int argc, char *argv[])
     
     destruirTablaSimbolos();
 
-    //cerramos el archivo
-    return(finSistemaEntrada());
-
-
-    
-
+    return(0);
 }
