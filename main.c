@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
         insertarPalabraReservada(aux);
     }
 
+    printf("\n\nImpresion de la Tabla de Símbolos\n");
+    imprimirArbol();
 
     //Iniciamos sistema de entrada
     if(inicia(argv[1])==-1){
@@ -53,8 +55,8 @@ int main(int argc, char *argv[])
     //Invocamos al analizador sintáctico
     sintactico();
 
-    /*printf("\n\nImpresion de la Tabla de Símbolos\n");
-    imprimirArbol();*/
+    printf("\n\nImpresion de la Tabla de Símbolos\n");
+    imprimirArbol();
     
     destruirTablaSimbolos();
 

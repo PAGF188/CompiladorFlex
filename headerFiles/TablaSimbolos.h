@@ -72,6 +72,6 @@ int insertarComponenteLexico(char* lexema);
 void destruirTablaSimbolos();
 
 //borrar
-//void imprimirArbol();
+void imprimirArbol();
 
 #endif	/* __TABLA_S */
