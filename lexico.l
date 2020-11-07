@@ -7,8 +7,19 @@ int lineas=0;  //variable global para hacer visible al lexico el nº de línea d
 %}
 %option noyywrap
 
+/*PATRONES PARA ENTEROS*/
+INTEGER_SUFIX       
+INTEGER             (([0-9][0-9_]*)|((0b)|(0B))[01][01_]*)([LuU]|(Lu)|(LU)|(uL)|(UL))?
+
+/*Auxiliares para FLOAT*/
+FloatSuffix         [fF]
+RealSuffix          L
+ImaginarySuffix     i
+FLOAT               ([fF]|(L)|(i)|(Li)|(fi)|(Fi))?
+
 IDENTIFICADOR       [_A-Za-z][A-Za-z0-9_]*
 STRING              \".*\"
+
 
 COMENTARIO_LINEA    \/\/.*
 COMENTARIO_BLOQUE   \/\*(.|\n)*\*\/
@@ -16,69 +27,78 @@ COMENTARIO_ANIDADO   \/\*(.|\n)*\*\/
 
 
 %%
+{INTEGER}               return(_ENTERO);
 
-{STRING}            return(_STRING);            
-{IDENTIFICADOR}     return(insertarComponenteLexico(strdup(yytext)));
+{INTEGER}{FloatSuffix}  |
+{INTEGER}{ImaginarySuffix}  |
+{INTEGER}{FloatSuffix}{ImaginarySuffix} |
+{INTEGER}{RealSuffix}{ImaginarySuffix}  |
+
+
+{STRING}                return(_STRING);            
+{IDENTIFICADOR}         return(insertarComponenteLexico(strdup(yytext)));
+
+
 {COMENTARIO_LINEA}  printf("\ncomentario linea: %s\n\n", yytext);
 {COMENTARIO_BLOQUE} printf("\ncomentario: %s\n\n", yytext);
 
 " "       ;
 \n        ++lineas;
-"/"       return((int) '/');
+"/"       return((int) yytext[0]);
 "/="      return(_BARRA_IGUAL);
-"."       return((int) '.');
+"."       return((int) yytext[0]);
 ".."      return(_DOS_PUNTOS);
 "..."     return(_TRES_PUNTOS);
-"&"       return((int) '&');
+"&"       return((int) yytext[0]);
 "&="      return(_AMP_IGUAL);
 "&&"      return(_AMP_AMP);
-"|"       return((int) '|');
+"|"       return((int) yytext[0]);
 "|="      return(_VERT_IGUAL);
 "||"      return(_VERT_VERT);
-"-"       return((int) '-');
+"-"       return((int) yytext[0]);
 "-="      return(_MENOS_IGUAL);
 "--"      return(_DOBLE_MENOS);
-"+"       return((int) '+');
+"+"       return((int) yytext[0]);
 "+="      return(_MAS_IGUAL);
 "++"      return(_DOBLE_MAS);
-"<"       return((int) '<');
+"<"       return((int) yytext[0]);
 "<="      return(_MENOR_O_IGUAL);
 "<<"      return(_MENOR_MENOR);
 "<<="     return(_DMENOR_IGUAL);
-">"       return((int) '>');
+">"       return((int) yytext[0]);
 ">="      return(_MAYOR_IGUAL);
 ">>="     return(_DMAYOR_IGUAL);
 ">>>="    return(_TMAYOR_IGUAL);
 ">>"      return(_DMAYOR);
 ">>>"     return(_TMAYOR);
-"!"       return((int) '!');
+"!"       return((int) yytext[0]);
 "!="      return(_ADMI_IGUAL);
-"("       return((int) '(');
-")"       return((int) ')');
-"["       return((int) '[');
-"]"       return((int) ']');
-"{"       return((int) '{');
-"}"       return((int) '}');
-"?"       return((int) '?');
-","       return((int) ',');
-";"       return((int) ';');
-":"       return((int) ':');
-"$"       return((int) '$');
-"="       return((int) '=');
+"("       |
+")"       |
+"["       |
+"]"       |
+"{"       |
+"}"       |
+"?"       |
+","       |
+";"       |
+":"       |
+"$"       |
+"="       return((int) yytext[0]);
 "=="      return(_DOBLE_IGUAL);
-"*"       return((int) '*');
+"*"       return((int) yytext[0]);
 "*="      return(_POR_IGUAL);
-"%"       return((int) '%');
+"%"       return((int) yytext[0]);
 "%="      return(_PORCIEN_IGUAL);
-"^"       return((int) '^');
+"^"       return((int) yytext[0]);
 "^="      return(_EXP_IGUAL);
 "^^"      return(_EXP_EXP);
 "^^="     return(_EXP_EXP_IGUAL);
-"~"       return((int) '~');
+"~"       return((int) yytext[0]);
 "~="      return(_BIR_IGUAL);
-"@"       return((int) '@');
+"@"       return((int) yytext[0]);
 "=>"      return(_IGUAL_MAYOR);
-"#"       return((int) '#');
+"#"       return((int) yytext[0]);
 
 <<EOF>> {
             //finArchivo();
