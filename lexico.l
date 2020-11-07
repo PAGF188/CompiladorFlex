@@ -7,16 +7,23 @@ int lineas=0;  //variable global para hacer visible al lexico el nº de línea d
 %}
 %option noyywrap
 
-/*PATRONES PARA ENTEROS*/
-INTEGER_SUFIX       
-INTEGER             (([0-9][0-9_]*)|((0b)|(0B))[01][01_]*)([LuU]|(Lu)|(LU)|(uL)|(UL))?
+/*PATRONES PARA ENTEROS. El principal es INTEGER_LITERAL. (no incluimos hexadecimales)*/
+INTEGER_LITERAL     {INTEGER}|({INTEGER}{INTEGER_SUFIX})
+INTEGER_SUFIX       ([LuU]|(Lu)|(LU)|(uL)|(UL))
+INTEGER             {BINARY_INTEGER}|{DECIMAL_INTEGER}
+DECIMAL_INTEGER     [0-9][0-9_]*
+BINARY_INTEGER      ((0b)|(0B))(([01][01_]*)|(_[01][01_]*))
 
-/*Auxiliares para FLOAT*/
-FloatSuffix         [fF]
-RealSuffix          L
-ImaginarySuffix     i
-FLOAT               ([fF]|(L)|(i)|(Li)|(fi)|(Fi))?
+/*PATRONES PARA FLOTANTES. El principal es FLOAT_LITERAL. (no incluimos hexadecimales)*/
+FLOAT_LITERAL       {FLOAT}|({FLOAT}|{SUFFIX})|({INTEGER}{FLOAT_SUFFIX})|({INTEGER}{IMAGINARY_SUFFIX})|({INTEGER}{FLOAT_SUFFIX}{IMAGINARY_SUFFIX})|({INTEGER}{REAL_SUFFIX}{IMAGINARY_SUFFIX})      
+SUFFIX              {FLOAT_SUFFIX}|{REAL_SUFFIX}|{IMAGINARY_SUFFIX}|({FLOAT_SUFFIX}{IMAGINARY_SUFFIX})|({REAL_SUFFIX}{IMAGINARY_SUFFIX})
+FLOAT_SUFFIX        [fF]
+REAL_SUFFIX         L
+IMAGINARY_SUFFIX    i
+FLOAT               ({DECIMAL_INTEGER}\.)|({DECIMAL_INTEGER}\.{DECIMAL_INTEGER})|({DECIMAL_INTEGER}\.{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|(\.{DECIMAL_INTEGER})|(\.{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|({DECIMAL_INTEGER}{DECIMAL_EXPONENT})
+DECIMAL_EXPONENT    ((e\+)|(E\+)|(e-)|(E-)|(e)|(E))(_[0-9][0-9]*|[0-9][0-9_]*)
 
+/*OTROS*/
 IDENTIFICADOR       [_A-Za-z][A-Za-z0-9_]*
 STRING              \".*\"
 
@@ -27,13 +34,9 @@ COMENTARIO_ANIDADO   \/\*(.|\n)*\*\/
 
 
 %%
-{INTEGER}               return(_ENTERO);
 
-{INTEGER}{FloatSuffix}  |
-{INTEGER}{ImaginarySuffix}  |
-{INTEGER}{FloatSuffix}{ImaginarySuffix} |
-{INTEGER}{RealSuffix}{ImaginarySuffix}  |
-
+{INTEGER_LITERAL}       return(_ENTERO);
+{FLOAT_LITERAL}         return(_FLOTANTE);
 
 {STRING}                return(_STRING);            
 {IDENTIFICADOR}         return(insertarComponenteLexico(strdup(yytext)));
