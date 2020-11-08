@@ -27,16 +27,16 @@ DECIMAL_EXPONENT    ((e\+)|(E\+)|(e-)|(E-)|(e)|(E))(_[0-9][0-9]*|[0-9][0-9_]*)
 IDENTIFICADOR       [_A-Za-z][A-Za-z0-9_]*
 
 /*SOLO SE CONTEMPLA: DoubleQuotedString:*/
-STRING              \"[^"]+\"{STRINGPOSTFIX}?
+
+STRING              \"([^"\\]|\\.)*\"{STRINGPOSTFIX}?
 STRINGPOSTFIX       [cwd]
 
 /*COMENTARIOS*/
 COMENTARIO_LINEA    \/\/.*
 /*Referencia: https://blog.ostermiller.org/finding-comments-in-source-code-using-regular-expressions/ */
 COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
-
-
-
+/*Comentario anidado no constituye un lenguaje regular -> no se puede resolver con autómata finito*/
+/*solución-> rutina en c*/
 
 %%
 
@@ -46,9 +46,23 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 {STRING}                return(_STRING);            
 {IDENTIFICADOR}         return(insertarComponenteLexico(strdup(yytext)));
 
+"/+" {
+    void comentario(){
+        char c1;
+        char c2;
+        do{
+            c1 = input();
+            c2 = input();
+            if(c1=='/' && c2=='+'){
+                comentario();
+            }
+        }while(c1!='+' || c2!='/');
+    }
+    comentario();
+}
+{COMENTARIO_LINEA}  ;
+{COMENTARIO_BLOQUE} ;
 
-{COMENTARIO_LINEA}  printf("\ncomentario linea: %s\n\n", yytext);
-{COMENTARIO_BLOQUE} printf("\ncomentario: %s\n\n", yytext);
 
 " "       ;
 \n        ++lineas;

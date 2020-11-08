@@ -1,8 +1,11 @@
 
 asd; s 985.6
-/*aosjdk	lasl*/dklasd
 
-	asdaksdl*/
+/+ lolo
+	/+acomen
+	+/ 
+	comentario
++/
 
 
-	askjd1.-asdji9as09dasd;
+	raro; pol
