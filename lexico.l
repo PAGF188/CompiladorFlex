@@ -1,11 +1,13 @@
 %{
 #include <stdio.h>
+#include <ctype.h>
 #include "./headerFiles/Definiciones.h"
 #include "./headerFiles/Errores.h"
 #include "./headerFiles/TablaSimbolos.h"
-int lineas=0;  //variable global para hacer visible al lexico el nº de línea donde estamos.
+int lineas=1;  //variable global para hacer visible al lexico el nº de línea donde estamos.
 %}
 %option noyywrap
+%option default
 
 /*PATRONES PARA ENTEROS. El principal es INTEGER_LITERAL. (no incluimos hexadecimales)*/
 INTEGER_LITERAL     {INTEGER}|({INTEGER}{INTEGER_SUFIX})
@@ -15,13 +17,13 @@ DECIMAL_INTEGER_NON_ZERO    (0|[1-9][0-9_]*)
 BINARY_INTEGER      ((0b)|(0B))(([01][01_]*)|(_[01][01_]*))
 
 /*PATRONES PARA FLOTANTES. El principal es FLOAT_LITERAL. (no incluimos hexadecimales)*/
-FLOAT_LITERAL       {FLOAT}|({FLOAT}|{SUFFIX})|({INTEGER}{FLOAT_SUFFIX})|({INTEGER}{IMAGINARY_SUFFIX})|({INTEGER}{FLOAT_SUFFIX}{IMAGINARY_SUFFIX})|({INTEGER}{REAL_SUFFIX}{IMAGINARY_SUFFIX})      
+FLOAT_LITERAL       {FLOAT}|({FLOAT}{SUFFIX})|({INTEGER}{FLOAT_SUFFIX})|({INTEGER}{IMAGINARY_SUFFIX})|({INTEGER}{FLOAT_SUFFIX}{IMAGINARY_SUFFIX})|({INTEGER}{REAL_SUFFIX}{IMAGINARY_SUFFIX})      
 SUFFIX              {FLOAT_SUFFIX}|{REAL_SUFFIX}|{IMAGINARY_SUFFIX}|({FLOAT_SUFFIX}{IMAGINARY_SUFFIX})|({REAL_SUFFIX}{IMAGINARY_SUFFIX})
 FLOAT_SUFFIX        [fF]
 REAL_SUFFIX         L
 IMAGINARY_SUFFIX    i
 DECIMAL_INTEGER     [0-9][0-9_]*
-FLOAT               ({DECIMAL_INTEGER_NON_ZERO}\.)|({DECIMAL_INTEGER_NON_ZERO}\.{DECIMAL_INTEGER})|({DECIMAL_INTEGER_NON_ZERO}\.{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|(\.{DECIMAL_INTEGER})|(\.{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|({DECIMAL_INTEGER_NON_ZERO}{DECIMAL_EXPONENT})
+FLOAT               ({DECIMAL_INTEGER_NON_ZERO}".")|({DECIMAL_INTEGER_NON_ZERO}"."{DECIMAL_INTEGER})|({DECIMAL_INTEGER_NON_ZERO}"."{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|("."{DECIMAL_INTEGER})|("."{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|({DECIMAL_INTEGER_NON_ZERO}{DECIMAL_EXPONENT})
 DECIMAL_EXPONENT    ((e\+)|(E\+)|(e-)|(E-)|(e)|(E))(_[0-9][0-9]*|[0-9][0-9_]*)
 
 IDENTIFICADOR       [_A-Za-z][A-Za-z0-9_]*
@@ -38,10 +40,16 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 /*Comentario anidado no constituye un lenguaje regular -> no se puede resolver con autómata finito*/
 /*solución-> rutina en c*/
 
+/*TERMINACIONES INCORRECTAS PARA FLOTANTES Y INTEGERS (pueden existir más)*/
+TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
+
 %%
 
-{INTEGER_LITERAL}       return(_ENTERO);
-{FLOAT_LITERAL}         return(_FLOTANTE);
+{INTEGER_LITERAL}                                   return(_ENTERO);
+{INTEGER_LITERAL}{TERMINACIONES_INCORRECTAS_FI}     imprimeError(7,lineas,yytext);
+
+{FLOAT_LITERAL}                                     return(_FLOTANTE);
+{FLOAT_LITERAL}{TERMINACIONES_INCORRECTAS_FI}       imprimeError(8,lineas,yytext);
 
 {STRING}                return(_STRING);            
 {IDENTIFICADOR}         return(insertarComponenteLexico(strdup(yytext)));
@@ -53,6 +61,12 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
         do{
             c1=c2;
             c2 = input();
+            if(c2==NULL){
+                imprimeError(10,lineas,NULL);
+                return;
+            }
+            if(c2=='\n')
+                lineas++;
             if(c1=='/' && c2=='+'){
                 unput(c2);
                 comentario();
@@ -123,10 +137,19 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 "=>"      return(_IGUAL_MAYOR);
 "#"       return((int) yytext[0]);
 
+<*>. { /*regla por defecto*/
+        if(isascii((int)yytext[0])){
+            if((int)yytext[0] == '"')
+                imprimeError(9,lineas,NULL);
+            else
+                imprimeError(6,lineas,yytext);
+            }
+        }
+
 <<EOF>> {
             if(yyin!=NULL){
                 if(fclose(yyin)!=0){
-                    imprimeError(3,-1);
+                    imprimeError(3,-1,NULL);
                 }
             }
             return(_EOF);
@@ -146,7 +169,7 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 int iniciaArchivo(char *path){
     yyin = fopen(path,"r");
     if(yyin==NULL){
-        imprimeError(2,-1);
+        imprimeError(2,-1,NULL);
         return(-1);
     }
     return(1);

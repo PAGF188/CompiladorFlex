@@ -12,27 +12,36 @@
 
 //Las definiciones de las funciones públicas se encuentran en el .h
 
-void imprimeError(int codigo, int linea){
+void imprimeError(int codigo, int linea, char * lexema){
 
     switch (codigo)
     {
     case 1:
-        printf("\n\nArgument error! : Solo puedes pasar un archivo para compilar.\n\n");
+        printf("Argument error! : Solo puedes pasar un archivo para compilar.\n\n");
         break;
     case 2: 
-        printf("\n\nEntry System error! : El archivo no es accesible.\n\n");
+        printf("Entry System error! : El archivo no es accesible.\n\n");
         break;
     case 3:
-        printf("\n\nEntry System error! : El archivo no se pudo cerrar.\n\n");
-        break;
-    case 4:
-        printf("\n\n(linea %d) Lexical Error! : El tamaño del lexema excede al máximo permitido.\n\n", linea);
+        printf("Entry System error! : El archivo no se pudo cerrar.\n\n");
         break;
     case 5:
-        printf("\n\n(linea %d) Lexical Error! : Falta exponente.\n\n",linea);
+        printf("(linea %d) Lexical Error! : Falta exponente.\n\n",linea);
         break;
     case 6:
-        printf("\n\n(linea %d) Lexical Error! : Caracter extraño.\n\n",linea);
+        printf("(linea %d) Lexical Error! Caracter extraño: %s\n\n",linea,lexema);
+        break;
+    case 7:
+        printf("(linea %d) Lexical Error! Entero mal formado: %s\n\n",linea, lexema);
+        break;
+    case 8:
+        printf("(linea %d) Lexical Error! Flotante mal formado: %s\n\n",linea, lexema);
+        break;
+     case 9:
+        printf("(linea %d) Lexical Error! Falta la \" de cierre del String. \n\n",linea);
+        break;
+    case 10:
+        printf("(linea %d) Lexical Error! Falta cierre del comentario.\n\n",linea);
         break;
     default:
         break;

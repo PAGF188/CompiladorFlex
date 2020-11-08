@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     //En principio un único archivo vamos a compilar.
 
     if(argc!=2){
-        imprimeError(1,-1);
+        imprimeError(1,-1,NULL);
         return(-1);
     }
     

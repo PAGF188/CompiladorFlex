@@ -1,11 +1,18 @@
+123123Kol
+123.3[
 
-asd; s 985.6
+"alsjjolaskdñaksñdñasd;
+89asd; +*/
+-
+[]
+/+alskdlasd
 
-/+ lolo
-	/+acomen
-	+/ 
-	comentario
-+/
+alskdlasdasd
 
 
-	raro; pol
+alskdlasd
+
+debug(aux)
+{
+	
+}
