@@ -124,7 +124,11 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 "#"       return((int) yytext[0]);
 
 <<EOF>> {
-            //finArchivo();
+            if(yyin!=NULL){
+                if(fclose(yyin)!=0){
+                    imprimeError(3,-1);
+                }
+            }
             return(_EOF);
         }
 
@@ -148,16 +152,3 @@ int iniciaArchivo(char *path){
     return(1);
 }
 
-/**
- * Cierra el archivo al finalizar la compilación.
- * @return int, código de éxito (-1 error en cierre, 1 cierre correcto).
- */
-int finArchivo(){
-    if(yyin!=NULL){
-        if(fclose(yyin)!=0){
-            imprimeError(3,-1);
-            return(-1);
-        }
-    }
-    return(1);
-}

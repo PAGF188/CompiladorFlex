@@ -1166,16 +1166,20 @@ return((int) yytext[0]);
 case YY_STATE_EOF(INITIAL):
 #line 126 "lexico.l"
 {
-            //finArchivo();
+            if(yyin!=NULL){
+                if(fclose(yyin)!=0){
+                    imprimeError(3,-1);
+                }
+            }
             return(_EOF);
         }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 134 "lexico.l"
+#line 138 "lexico.l"
 ECHO;
 	YY_BREAK
-#line 1179 "lex.yy.c"
+#line 1183 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2174,7 +2178,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 134 "lexico.l"
+#line 138 "lexico.l"
 
 
 /**
@@ -2193,17 +2197,4 @@ int iniciaArchivo(char *path){
     return(1);
 }
 
-/**
- * Cierra el archivo al finalizar la compilación.
- * @return int, código de éxito (-1 error en cierre, 1 cierre correcto).
- */
-int finArchivo(){
-    if(yyin!=NULL){
-        if(fclose(yyin)!=0){
-            imprimeError(3,-1);
-            return(-1);
-        }
-    }
-    return(1);
-}
 
