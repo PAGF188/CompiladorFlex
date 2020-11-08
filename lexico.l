@@ -48,12 +48,13 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 
 "/+" {
     void comentario(){
-        char c1;
-        char c2;
+        char c1 = '+';
+        char c2 = input();
         do{
-            c1 = input();
+            c1=c2;
             c2 = input();
             if(c1=='/' && c2=='+'){
+                unput(c2);
                 comentario();
             }
         }while(c1!='+' || c2!='/');
