@@ -38,10 +38,10 @@ void imprimeError(int codigo, int linea, char * lexema){
         printf("(linea %d) Lexical Error! Flotante mal formado: %s\n\n",linea, lexema);
         break;
      case 9:
-        printf("(linea %d) Lexical Error! Falta la \" de cierre del String. \n\n",linea);
+        printf("(linea %d) Lexical Error! Falta la \" de cierre del String: \" \n\n",linea);
         break;
     case 10:
-        printf("(linea %d) Lexical Error! Falta cierre del comentario.\n\n",linea);
+        printf("(linea %d) Lexical Error! Falta cierre del comentario: +/\n\n",linea);
         break;
     default:
         break;

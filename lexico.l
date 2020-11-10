@@ -7,7 +7,6 @@
 int lineas=1;  //variable global para hacer visible al lexico el nº de línea donde estamos.
 %}
 %option noyywrap
-%option default
 
 /*PATRONES PARA ENTEROS. El principal es INTEGER_LITERAL. (no incluimos hexadecimales)*/
 INTEGER_LITERAL     {INTEGER}|({INTEGER}{INTEGER_SUFIX})
@@ -24,7 +23,7 @@ REAL_SUFFIX         L
 IMAGINARY_SUFFIX    i
 DECIMAL_INTEGER     [0-9][0-9_]*
 FLOAT               ({DECIMAL_INTEGER_NON_ZERO}".")|({DECIMAL_INTEGER_NON_ZERO}"."{DECIMAL_INTEGER})|({DECIMAL_INTEGER_NON_ZERO}"."{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|("."{DECIMAL_INTEGER})|("."{DECIMAL_INTEGER}{DECIMAL_EXPONENT})|({DECIMAL_INTEGER_NON_ZERO}{DECIMAL_EXPONENT})
-DECIMAL_EXPONENT    ((e\+)|(E\+)|(e-)|(E-)|(e)|(E))(_[0-9][0-9]*|[0-9][0-9_]*)
+DECIMAL_EXPONENT    ((e\+)|(E\+)|(e-)|(E-)|(e)|(E))(_?[0-9][0-9_]*)
 
 IDENTIFICADOR       [_A-Za-z][A-Za-z0-9_]*
 
@@ -40,7 +39,7 @@ COMENTARIO_BLOQUE   \/\*([^*]|[\n]|(\*+([^*\/]|[\n])))*\*+\/
 /*Comentario anidado no constituye un lenguaje regular -> no se puede resolver con autómata finito*/
 /*solución-> rutina en c*/
 
-/*TERMINACIONES INCORRECTAS PARA FLOTANTES Y INTEGERS (pueden existir más)*/
+/*TERMINACIONES INCORRECTAS PARA FLOTANTES Y INTEGERS (pueden existir más!!)*/
 TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
 
 %%
@@ -51,7 +50,8 @@ TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
 {FLOAT_LITERAL}                                     return(_FLOTANTE);
 {FLOAT_LITERAL}{TERMINACIONES_INCORRECTAS_FI}       imprimeError(8,lineas,yytext);
 
-{STRING}                return(_STRING);            
+{STRING}                return(_STRING);    
+    /*Identificadores y palabras reservadas!! (la tabla de símbolos resuelve el problema)*/        
 {IDENTIFICADOR}         return(insertarComponenteLexico(strdup(yytext)));
 
 "/+" {
@@ -61,7 +61,7 @@ TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
         do{
             c1=c2;
             c2 = input();
-            if(c2==NULL){
+            if(c1==(char)0 || c2==(char)0){
                 imprimeError(10,lineas,NULL);
                 return;
             }
@@ -81,35 +81,43 @@ TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
 
 " "       ;
 \n        ++lineas;
-"/"       return((int) yytext[0]);
 "/="      return(_BARRA_IGUAL);
-"."       return((int) yytext[0]);
 ".."      return(_DOS_PUNTOS);
 "..."     return(_TRES_PUNTOS);
-"&"       return((int) yytext[0]);
 "&="      return(_AMP_IGUAL);
 "&&"      return(_AMP_AMP);
-"|"       return((int) yytext[0]);
 "|="      return(_VERT_IGUAL);
 "||"      return(_VERT_VERT);
-"-"       return((int) yytext[0]);
 "-="      return(_MENOS_IGUAL);
 "--"      return(_DOBLE_MENOS);
-"+"       return((int) yytext[0]);
 "+="      return(_MAS_IGUAL);
 "++"      return(_DOBLE_MAS);
-"<"       return((int) yytext[0]);
 "<="      return(_MENOR_O_IGUAL);
 "<<"      return(_MENOR_MENOR);
 "<<="     return(_DMENOR_IGUAL);
-">"       return((int) yytext[0]);
 ">="      return(_MAYOR_IGUAL);
 ">>="     return(_DMAYOR_IGUAL);
 ">>>="    return(_TMAYOR_IGUAL);
 ">>"      return(_DMAYOR);
 ">>>"     return(_TMAYOR);
-"!"       return((int) yytext[0]);
 "!="      return(_ADMI_IGUAL);
+"=="      return(_DOBLE_IGUAL);
+"*="      return(_POR_IGUAL);
+"%="      return(_PORCIEN_IGUAL);
+"^="      return(_EXP_IGUAL);
+"^^"      return(_EXP_EXP);
+"^^="     return(_EXP_EXP_IGUAL);
+"~="      return(_BIR_IGUAL);
+"=>"      return(_IGUAL_MAYOR);
+"-"       |
+">"       |
+"<"       |
+"!"       |
+"+"       | 
+"|"       |
+"&"       |
+"."       |
+"/"       |
 "("       |
 ")"       |
 "["       |
@@ -120,25 +128,19 @@ TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
 ","       |
 ";"       |
 ":"       |
+"*"       |
 "$"       |
+"%"       |
+"^"       |
+"~"       |
+"@"       |
+"#"       |
 "="       return((int) yytext[0]);
-"=="      return(_DOBLE_IGUAL);
-"*"       return((int) yytext[0]);
-"*="      return(_POR_IGUAL);
-"%"       return((int) yytext[0]);
-"%="      return(_PORCIEN_IGUAL);
-"^"       return((int) yytext[0]);
-"^="      return(_EXP_IGUAL);
-"^^"      return(_EXP_EXP);
-"^^="     return(_EXP_EXP_IGUAL);
-"~"       return((int) yytext[0]);
-"~="      return(_BIR_IGUAL);
-"@"       return((int) yytext[0]);
-"=>"      return(_IGUAL_MAYOR);
-"#"       return((int) yytext[0]);
 
-<*>. { /*regla por defecto*/
+
+. { /*regla por defecto*/
         if(isascii((int)yytext[0])){
+            /*Si el carácter que sobro es " -> no se cerro STRING*/
             if((int)yytext[0] == '"')
                 imprimeError(9,lineas,NULL);
             else
@@ -154,9 +156,6 @@ TERMINACIONES_INCORRECTAS_FI        [A-Za-z.&|!\[{]
             }
             return(_EOF);
         }
-
-
-
 
 %%
 /**
