@@ -29,9 +29,6 @@ typedef char* tipoclave;
 /////// VARIABLE GLOBAL CON LA TABLA DE SÍMBOLOS (nodo raíz)
 abb tablaSimbolos;
 
-//////  VARIABLE GLOBAL IDENTIFICADOR DE IDENTIFICADORES
-unsigned int global_ID = 500;
-
 
 
 /////////////////// DEFINICIÓN FUNCIONES PRIVADAS

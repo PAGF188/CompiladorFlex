@@ -25,9 +25,6 @@ void imprimeError(int codigo, int linea, char * lexema){
     case 3:
         printf("Entry System error! : El archivo no se pudo cerrar.\n\n");
         break;
-    case 5:
-        printf("(linea %d) Lexical Error! : Falta exponente.\n\n",linea);
-        break;
     case 6:
         printf("(linea %d) Lexical Error! Caracter extraño: %s\n\n",linea,lexema);
         break;
